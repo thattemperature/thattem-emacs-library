@@ -2,6 +2,8 @@
 #include <glibtop.h>
 #include <glibtop/cpu.h>
 #include <glibtop/mem.h>
+#include <glibtop/netlist.h>
+#include <glibtop/netload.h>
 #include <glibtop/swap.h>
 
 static glibtop_cpu old_cpu, new_cpu;
@@ -30,4 +32,40 @@ double get_swap_usage() {
   glibtop_get_swap(&now_swap);
   double usage = (double)now_swap.used / (double)now_swap.total;
   return usage;
+}
+
+static const guint64 loopback_mask = 1UL << GLIBTOP_IF_FLAGS_LOOPBACK;
+static gchar **interface_names;
+static glibtop_netlist netlist;
+static glibtop_netload netload;
+static guint64 old_in, old_out;
+static guint64 new_in, new_out;
+static gint64 old_time, new_time;
+static void get_net_load(guint64 *in, guint64 *out) {
+  interface_names = glibtop_get_netlist(&netlist);
+  guint64 total_in = 0UL, total_out = 0UL;
+  for (guint64 i = 0UL; i < netlist.number; i++) {
+    glibtop_get_netload(&netload, interface_names[i]);
+    if (netload.if_flags & loopback_mask)
+      continue;
+    total_in += netload.bytes_in;
+    total_out += netload.bytes_out;
+  }
+  g_strfreev(interface_names);
+  *in = total_in;
+  *out = total_out;
+}
+void init_net_speed() {
+  old_time = g_get_monotonic_time();
+  get_net_load(&old_in, &old_out);
+}
+void get_net_speed(double *in_speed, double *out_speed) {
+  new_time = g_get_monotonic_time();
+  get_net_load(&new_in, &new_out);
+  double time_delta = (double)(new_time - old_time) / (double)G_USEC_PER_SEC;
+  *in_speed = (double)(new_in - old_in) / time_delta;
+  *out_speed = (double)(new_out - old_out) / time_delta;
+  old_time = new_time;
+  old_in = new_in;
+  old_out = new_out;
 }
