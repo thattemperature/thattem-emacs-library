@@ -23,3 +23,7 @@ target_include_directories(thattem_emacs_library
 target_link_libraries(thattem_emacs_library
   PRIVATE
   PkgConfig::GTOP)
+
+
+install(TARGETS thattem_emacs_library
+  LIBRARY DESTINATION lib)
