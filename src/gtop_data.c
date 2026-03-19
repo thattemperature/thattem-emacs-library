@@ -14,8 +14,8 @@ double get_cpu_usage() {
   guint64 user_delta = new_cpu.user - old_cpu.user;
   guint64 sys_delta = new_cpu.sys - old_cpu.sys;
   guint64 nice_delta = new_cpu.nice - old_cpu.nice;
-  double usage =
-      (double)(user_delta + sys_delta + nice_delta) / (double)total_delta;
+  double usage = (double)(user_delta + sys_delta + nice_delta) /
+                 (double)(total_delta == 0 ? 1 : total_delta);
   old_cpu = new_cpu;
   return usage;
 }
@@ -23,14 +23,16 @@ double get_cpu_usage() {
 static glibtop_mem now_mem;
 double get_mem_usage() {
   glibtop_get_mem(&now_mem);
-  double usage = (double)now_mem.user / (double)now_mem.total;
+  double usage =
+      (double)now_mem.user / (double)(now_mem.total == 0 ? 1 : now_mem.total);
   return usage;
 }
 
 static glibtop_swap now_swap;
 double get_swap_usage() {
   glibtop_get_swap(&now_swap);
-  double usage = (double)now_swap.used / (double)now_swap.total;
+  double usage = (double)now_swap.used /
+                 (double)(now_swap.total == 0 ? 1 : now_swap.total);
   return usage;
 }
 
@@ -62,9 +64,12 @@ void init_net_speed() {
 void get_net_speed(double *in_speed, double *out_speed) {
   new_time = g_get_monotonic_time();
   get_net_load(&new_in, &new_out);
-  double time_delta = (double)(new_time - old_time) / (double)G_USEC_PER_SEC;
-  *in_speed = (double)(new_in - old_in) / time_delta;
-  *out_speed = (double)(new_out - old_out) / time_delta;
+  guint64 in_delta = new_in > old_in ? new_in - old_in : 0;
+  guint64 out_delta = new_out > old_out ? new_out - old_out : 0;
+  double time_delta = (double)(new_time == old_time ? 1 : new_time - old_time) /
+                      (double)G_USEC_PER_SEC;
+  *in_speed = (double)in_delta / time_delta;
+  *out_speed = (double)out_delta / time_delta;
   old_time = new_time;
   old_in = new_in;
   old_out = new_out;
