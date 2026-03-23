@@ -23,6 +23,8 @@
 
         libraries = with pkgs; [
           libgtop
+          libsysprof-capture
+          pcre2
           emacs
         ];
 
