@@ -34,7 +34,9 @@
         devShells.default = pkgs.mkShell {
           name = "thattem-emacs-library-shell";
 
-          buildInputs = build-tools ++ libraries;
+          nativeBuildInputs = build-tools;
+
+          buildInputs = libraries;
 
         };
       }
