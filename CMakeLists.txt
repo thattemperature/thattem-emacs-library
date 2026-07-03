@@ -6,6 +6,7 @@ project(Thattem_Emacs_Library)
 
 add_library(thattem_emacs_library SHARED
   src/thattem_emacs_library.c
+  src/gdbus_control.c
   src/gtop_data.c)
 
 
