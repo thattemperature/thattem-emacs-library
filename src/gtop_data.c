@@ -7,8 +7,8 @@
 #include <glibtop/swap.h>
 
 static glibtop_cpu old_cpu, new_cpu;
-void init_cpu_usage() { glibtop_get_cpu(&old_cpu); }
-double get_cpu_usage() {
+void init_cpu_usage(void) { glibtop_get_cpu(&old_cpu); }
+double get_cpu_usage(void) {
   glibtop_get_cpu(&new_cpu);
   guint64 total_delta = new_cpu.total - old_cpu.total;
   guint64 user_delta = new_cpu.user - old_cpu.user;
@@ -21,7 +21,7 @@ double get_cpu_usage() {
 }
 
 static glibtop_mem now_mem;
-double get_mem_usage() {
+double get_mem_usage(void) {
   glibtop_get_mem(&now_mem);
   double usage =
       (double)now_mem.user / (double)(now_mem.total == 0 ? 1 : now_mem.total);
@@ -29,7 +29,7 @@ double get_mem_usage() {
 }
 
 static glibtop_swap now_swap;
-double get_swap_usage() {
+double get_swap_usage(void) {
   glibtop_get_swap(&now_swap);
   double usage = (double)now_swap.used /
                  (double)(now_swap.total == 0 ? 1 : now_swap.total);
@@ -57,7 +57,7 @@ static void get_net_load(guint64 *in, guint64 *out) {
   *in = total_in;
   *out = total_out;
 }
-void init_net_speed() {
+void init_net_speed(void) {
   old_time = g_get_monotonic_time();
   get_net_load(&old_in, &old_out);
 }

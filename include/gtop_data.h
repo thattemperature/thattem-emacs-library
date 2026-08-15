@@ -1,9 +1,9 @@
-void init_cpu_usage();
-double get_cpu_usage();
+void init_cpu_usage(void);
+double get_cpu_usage(void);
 
-double get_mem_usage();
+double get_mem_usage(void);
 
-double get_swap_usage();
+double get_swap_usage(void);
 
-void init_net_speed();
+void init_net_speed(void);
 void get_net_speed(double *in_speed, double *out_speed);
