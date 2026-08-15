@@ -92,6 +92,8 @@ static emacs_value workspace_switch(emacs_env *env, ptrdiff_t nargs,
                                     emacs_value args[], void *data) {
   GError *error = NULL;
   intmax_t index = env->extract_integer(env, args[0]);
+  if (env->non_local_exit_check(env) != emacs_funcall_exit_return)
+    return env->intern(env, "nil");
 
   int result = switch_workspace_to(index, &error);
 
